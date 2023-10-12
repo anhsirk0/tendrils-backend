@@ -5,8 +5,8 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
 } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { Plant, Tendril } from './';
+import { nanoid } from 'nanoid';
 
 @Entity()
 export class Curl {
@@ -33,6 +33,6 @@ export class Curl {
 
   @BeforeInsert()
   createUuid() {
-    this.uuid = uuidv4();
+    this.uuid = nanoid();
   }
 }

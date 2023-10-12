@@ -6,7 +6,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import { Plant, Curl } from './';
 
 @Entity()
@@ -37,6 +37,6 @@ export class Tendril {
 
   @BeforeInsert()
   createUuid() {
-    this.uuid = uuidv4();
+    this.uuid = nanoid();
   }
 }

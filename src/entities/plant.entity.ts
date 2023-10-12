@@ -6,7 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import * as argon2 from 'argon2';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 import { Tendril, Curl } from './';
 
 @Entity()
@@ -45,6 +45,6 @@ export class Plant {
 
   @BeforeInsert()
   createUuid() {
-    this.uuid = uuidv4();
+    this.uuid = nanoid();
   }
 }
