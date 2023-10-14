@@ -10,7 +10,7 @@ export class SignupDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  username: string;
+  plantname: string;
 
   @ApiProperty()
   @IsString()
@@ -22,7 +22,7 @@ export class SigninDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  username: string;
+  plantname: string;
 
   @ApiProperty()
   @IsString()

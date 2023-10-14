@@ -50,7 +50,7 @@ export class TendrilsService {
 
     return {
       status: 200,
-      message: `Retrieved all tendrils for '${plant.username}'`,
+      message: `Retrieved all tendrils for '${plant.plantname}'`,
       data: tendrils,
     };
   }

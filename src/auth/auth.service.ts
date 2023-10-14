@@ -24,7 +24,7 @@ export class AuthService {
   async signin(dto: SigninDto): Promise<StatusOk> {
     let plant: Plant;
     plant = await this.plantsRepository.findOne({
-      where: { username: dto.username },
+      where: { plantname: dto.plantname },
     });
 
     if (!plant) throw new BadRequestException('Plant does not exists');
@@ -37,14 +37,14 @@ export class AuthService {
     return {
       status: 200,
       message: 'Login successful',
-      data: { uuid: plant.uuid, name: plant.name, username: plant.username },
+      data: { uuid: plant.uuid, name: plant.name, plantname: plant.plantname },
     };
   }
 
   async signup(dto: SignupDto): Promise<StatusOk> {
     let plant: Plant;
     plant = await this.plantsRepository.findOne({
-      where: { username: dto.username },
+      where: { plantname: dto.plantname },
     });
 
     if (plant) throw new BadRequestException('Account already exists');
@@ -54,7 +54,7 @@ export class AuthService {
 
     return {
       status: 200,
-      message: `Plant '${dto.username}' created successfully`,
+      message: `Plant '${dto.plantname}' created successfully`,
     };
   }
 }

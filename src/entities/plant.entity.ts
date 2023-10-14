@@ -18,7 +18,7 @@ export class Plant {
   name: string;
 
   @Column({ unique: true, length: 17 })
-  username: string;
+  plantname: string;
 
   @Column()
   password: string;
