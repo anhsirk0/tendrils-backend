@@ -18,7 +18,7 @@ export class TendrilsService {
 
   async createTendril(dto: CreateTendrilDto): Promise<StatusOk> {
     let plant = await this.plantRepository.findOne({
-      where: { uuid: dto.plantUuid },
+      where: { plantname: dto.plantname },
     });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
@@ -35,16 +35,16 @@ export class TendrilsService {
     };
   }
 
-  async getAllTendrils(plantUuid: string): Promise<StatusOk> {
+  async getAllTendrils(plantname: string): Promise<StatusOk> {
     let plant: Plant = await this.plantRepository.findOne({
-      where: { uuid: plantUuid },
+      where: { plantname },
     });
 
     if (!plant) throw new BadRequestException('Plant does not exists');
 
     let tendrils = await this.tendrilRepository.find({
       where: {
-        plant: { uuid: plantUuid },
+        plant: { plantname },
       },
     });
 

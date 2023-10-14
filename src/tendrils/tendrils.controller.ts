@@ -14,9 +14,9 @@ export class TendrilsController {
     return this.tendrilsService.createTendril(dto);
   }
 
-  @Get('all/:plantUuid')
-  getAllTendrils(@Param('plantUuid') plantUuid: string): Promise<StatusOk> {
-    return this.tendrilsService.getAllTendrils(plantUuid);
+  @Get('all/:plantname')
+  getAllTendrils(@Param('plantname') plantname: string): Promise<StatusOk> {
+    return this.tendrilsService.getAllTendrils(plantname);
   }
 
   @Get(':uuid')

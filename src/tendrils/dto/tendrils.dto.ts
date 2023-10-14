@@ -5,7 +5,7 @@ export class CreateTendrilDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  plantUuid: string;
+  plantname: string;
 
   @ApiProperty()
   @IsString()
