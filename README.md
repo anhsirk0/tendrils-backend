@@ -24,7 +24,20 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+[Nest](https://github.com/nestjs/nest) backend for simple text based social media app
+
+#### Api points
+- [x] auth/signin
+- [x] auth/signup
+- [ ] plants/delete
+- [ ] plants/update
+- [ ] plants/change-password
+- [x] tendrils/create
+- [ ] tendrils/update
+- [ ] tendrils/delete
+- [x] tendrils/:id
+- [x] tendrils/all/:plantId
+
 
 ## Installation
 

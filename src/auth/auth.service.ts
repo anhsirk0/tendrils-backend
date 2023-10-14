@@ -36,7 +36,7 @@ export class AuthService {
 
     return {
       status: 200,
-      message: 'Login successfull',
+      message: 'Login successful',
       data: { uuid: plant.uuid, name: plant.name, username: plant.username },
     };
   }

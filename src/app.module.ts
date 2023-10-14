@@ -5,7 +5,6 @@ import { TendrilsModule } from './tendrils/tendrils.module';
 
 @Module({
   imports: [
-    // AuthModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite3',
@@ -14,9 +13,6 @@ import { TendrilsModule } from './tendrils/tendrils.module';
     }),
     AuthModule,
     TendrilsModule,
-    // UsersModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
