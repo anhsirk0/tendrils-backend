@@ -13,9 +13,6 @@ export class Curl {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 17, name: 'tendril_uuid' })
-  tendrilUuid: string;
-
   @ManyToOne(() => Plant, (plant) => plant.curls)
   plant: Plant;
 

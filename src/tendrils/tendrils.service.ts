@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 // local imports
 import { StatusOk } from 'src/types';
-import { Tendril, Plant } from 'src/entities';
+import { Tendril, Plant, Curl } from 'src/entities';
 import { CreateTendrilDto } from './dto';
 
 @Injectable()
@@ -14,6 +14,8 @@ export class TendrilsService {
     private tendrilRepository: Repository<Tendril>,
     @InjectRepository(Plant)
     private plantRepository: Repository<Plant>,
+    @InjectRepository(Curl)
+    private curlRepository: Repository<Curl>,
   ) {}
 
   async createTendril(dto: CreateTendrilDto): Promise<StatusOk> {
@@ -22,16 +24,22 @@ export class TendrilsService {
     });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
+    let curl = this.curlRepository.create({
+      plant,
+    });
+    curl = await this.curlRepository.save(curl);
+
     let tendril = this.tendrilRepository.create({
       title: dto.title,
       body: dto.body,
       plant,
+      curls: [curl],
     });
     tendril = await this.tendrilRepository.save(tendril);
 
     return {
       status: 201,
-      message: `Tendril '{dto.title}' created successfully`,
+      message: `Tendril '${dto.title}' created successfully`,
     };
   }
 
@@ -43,6 +51,7 @@ export class TendrilsService {
     if (!plant) throw new BadRequestException('Plant does not exists');
 
     let tendrils = await this.tendrilRepository.find({
+      relations: ['curls'],
       where: {
         plant: { plantname },
       },
