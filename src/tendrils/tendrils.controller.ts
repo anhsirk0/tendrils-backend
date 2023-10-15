@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Param } from '@nestjs/common';
 import { StatusOk } from 'src/types';
 
 import { TendrilsService } from './tendrils.service';
-import { CreateTendrilDto } from './dto';
+import { AddCurlDto, CreateTendrilDto } from './dto';
 import { Tendril } from 'src/entities';
 
 @Controller('tendrils')
@@ -22,5 +22,10 @@ export class TendrilsController {
   @Get(':uuid')
   getTendrilByUuid(@Param('uuid') uuid: string): Promise<StatusOk<Tendril>> {
     return this.tendrilsService.getTendrilByUuid(uuid);
+  }
+
+  @Post('add-curl')
+  addCurl(@Body() dto: AddCurlDto): Promise<StatusOk> {
+    return this.tendrilsService.addCurl(dto);
   }
 }

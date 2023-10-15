@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 // local imports
 import { StatusOk } from 'src/types';
 import { Tendril, Plant, Curl } from 'src/entities';
-import { CreateTendrilDto } from './dto';
+import { AddCurlDto, CreateTendrilDto } from './dto';
 
 @Injectable()
 export class TendrilsService {
@@ -24,9 +24,7 @@ export class TendrilsService {
     });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
-    let curl = this.curlRepository.create({
-      plant,
-    });
+    let curl = this.curlRepository.create({ plant });
     curl = await this.curlRepository.save(curl);
 
     let tendril = this.tendrilRepository.create({
@@ -75,6 +73,41 @@ export class TendrilsService {
       status: 200,
       message: 'Retrieved tendril successfully',
       data: tendril,
+    };
+  }
+
+  async addCurl(dto: AddCurlDto): Promise<StatusOk> {
+    let plant = await this.plantRepository.findOne({
+      where: { plantname: dto.plantname },
+    });
+    if (!plant) throw new BadRequestException('Plant does not exists');
+
+    let tendril = await this.tendrilRepository.findOne({
+      relations: ['curls', 'curls.plant'],
+      where: { uuid: dto.tendrilUuid },
+    });
+    if (!tendril) throw new BadRequestException('Tendril does not exists');
+
+    let newCurls = tendril.curls;
+    let curl = await this.curlRepository.findOne({
+      where: { plant: { uuid: plant.uuid }, tendril: { uuid: tendril.uuid } },
+    });
+    if (!curl) {
+      curl = this.curlRepository.create({ plant });
+      curl = await this.curlRepository.save(curl);
+      newCurls = [curl, ...tendril.curls];
+    } else {
+      newCurls = newCurls.filter((c) => c.plant.uuid !== plant.uuid);
+    }
+
+    tendril = await this.tendrilRepository.save({
+      ...tendril,
+      curls: newCurls,
+    });
+
+    return {
+      status: 201,
+      message: `Tendril '${dto.tendrilUuid}' curled successfully`,
     };
   }
 }

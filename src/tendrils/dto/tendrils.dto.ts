@@ -17,3 +17,15 @@ export class CreateTendrilDto {
   @IsNotEmpty()
   body: string;
 }
+
+export class AddCurlDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  plantname: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  tendrilUuid: string;
+}
