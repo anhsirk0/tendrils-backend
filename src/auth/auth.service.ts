@@ -35,7 +35,7 @@ export class AuthService {
     if (!passMatch) throw new UnauthorizedException('Invalid Credentials');
 
     return {
-      status: 200,
+      status: 201,
       message: 'Login successful',
       data: { uuid: plant.uuid, name: plant.name, plantname: plant.plantname },
     };
@@ -53,7 +53,7 @@ export class AuthService {
     plant = await this.plantsRepository.save(plant);
 
     return {
-      status: 200,
+      status: 201,
       message: `Plant '${dto.plantname}' created successfully`,
     };
   }
