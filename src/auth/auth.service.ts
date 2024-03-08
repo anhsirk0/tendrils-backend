@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
 import { Plant } from 'src/entities';
@@ -15,6 +16,7 @@ export class AuthService {
   constructor(
     @InjectRepository(Plant)
     private plantsRepository: Repository<Plant>,
+    private jwtService: JwtService,
   ) {}
 
   // async remove(id: string): Promise<void> {
@@ -34,10 +36,14 @@ export class AuthService {
 
     if (!passMatch) throw new UnauthorizedException('Invalid Credentials');
 
+    const token = await this.jwtService.signAsync({
+      sub: plant.uuid,
+      username: plant.plantname,
+    });
     return {
       status: 201,
       message: 'Login successful',
-      data: { uuid: plant.uuid, name: plant.name, plantname: plant.plantname },
+      data: { name: plant.name, plantname: plant.plantname, token },
     };
   }
 
