@@ -1,11 +1,21 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { StatusOk } from 'src/types';
 import { PlantsService } from './plants.service';
-import { UpdatePlantDto, DeletePlantDto, ChangePasswordDto } from './dto';
+import {
+  UpdatePlantDto,
+  DeletePlantDto,
+  ChangePasswordDto,
+  ToggleFollowingDto,
+} from './dto';
 
 @Controller('plants')
 export class PlantsController {
   constructor(private plantsService: PlantsService) {}
+
+  @Post('toggle-follow')
+  toggleFollowing(@Body() dto: ToggleFollowingDto): Promise<StatusOk> {
+    return this.plantsService.toggleFollowing(dto);
+  }
 
   @Post('change-password')
   changePassword(@Body() dto: ChangePasswordDto): Promise<StatusOk> {
