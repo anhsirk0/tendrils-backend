@@ -2,14 +2,13 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
-
 import { Plant } from 'src/entities';
 import { StatusOk } from 'src/types';
 import {
   UpdatePlantDto,
   DeletePlantDto,
   ChangePasswordDto,
-  ToggleFollowingDto,
+  PlantnameDto,
 } from './dto';
 
 @Injectable()
@@ -19,9 +18,9 @@ export class PlantsService {
     private plantsRepository: Repository<Plant>,
   ) {}
 
-  async updatePlant(dto: UpdatePlantDto): Promise<StatusOk> {
+  async updatePlant(dto: UpdatePlantDto, name: string): Promise<StatusOk> {
     let plant = await this.plantsRepository.findOne({
-      where: { uuid: dto.uuid },
+      where: { plantname: name },
     });
 
     if (!plant) throw new BadRequestException('Plant does not exists');
@@ -39,10 +38,46 @@ export class PlantsService {
     };
   }
 
-  async toggleFollowing(dto: ToggleFollowingDto): Promise<StatusOk> {
+  async getFollowings(dto: PlantnameDto): Promise<StatusOk> {
     let plant = await this.plantsRepository.findOne({
       relations: ['followings'],
-      where: { uuid: dto.uuid },
+      where: { plantname: dto.plantname },
+      select: {
+        followings: { id: true, name: true, plantname: true },
+      },
+    });
+
+    if (!plant) throw new BadRequestException('Plant does not exists');
+
+    return {
+      status: 201,
+      message: 'Fetched followings successfully',
+      data: { plantname: plant.plantname, followings: plant.followings },
+    };
+  }
+
+  async getFollowers(dto: PlantnameDto): Promise<StatusOk> {
+    let plant = await this.plantsRepository.findOne({
+      relations: ['followers'],
+      where: { plantname: dto.plantname },
+      select: {
+        followers: { id: true, name: true, plantname: true },
+      },
+    });
+
+    if (!plant) throw new BadRequestException('Plant does not exists');
+
+    return {
+      status: 201,
+      message: 'Fetched followers successfully',
+      data: { plantname: plant.plantname, followers: plant.followers },
+    };
+  }
+
+  async toggleFollowing(dto: PlantnameDto, name: string): Promise<StatusOk> {
+    let plant = await this.plantsRepository.findOne({
+      relations: ['followings'],
+      where: { plantname: name },
     });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
@@ -74,9 +109,9 @@ export class PlantsService {
     };
   }
 
-  async deletePlant(dto: DeletePlantDto): Promise<StatusOk> {
+  async deletePlant(dto: DeletePlantDto, name: string): Promise<StatusOk> {
     let plant = await this.plantsRepository.findOne({
-      where: { uuid: dto.uuid },
+      where: { plantname: name },
     });
 
     if (!plant) throw new BadRequestException('Plant does not exists');
@@ -92,9 +127,12 @@ export class PlantsService {
     };
   }
 
-  async changePassword(dto: ChangePasswordDto): Promise<StatusOk> {
+  async changePassword(
+    dto: ChangePasswordDto,
+    name: string,
+  ): Promise<StatusOk> {
     let plant = await this.plantsRepository.findOne({
-      where: { plantname: dto.plantname },
+      where: { plantname: name },
     });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
@@ -117,7 +155,7 @@ export class PlantsService {
 
     return {
       status: 201,
-      message: `Password for '${dto.plantname}' updated successfully`,
+      message: `Password for '${name}' updated successfully`,
     };
   }
 }
