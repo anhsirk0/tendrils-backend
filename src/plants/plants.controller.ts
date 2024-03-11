@@ -18,6 +18,11 @@ export class PlantsController {
     return this.plantsService.toggleFollowing(dto, name);
   }
 
+  @Get('profile')
+  getProfile(@Body() dto: PlantnameDto) {
+    return this.plantsService.getProfile(dto);
+  }
+
   @Get('followings')
   getFollowings(@Body() dto: PlantnameDto) {
     return this.plantsService.getFollowings(dto);

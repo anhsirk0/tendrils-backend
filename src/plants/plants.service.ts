@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
+import { pick } from 'src/helpers';
 import { Plant } from 'src/entities';
 import { StatusOk } from 'src/types';
 import {
@@ -35,6 +36,36 @@ export class PlantsService {
       status: 201,
       message: 'Updated plant successfully',
       data: { name: dto.name },
+    };
+  }
+
+  async getProfile(dto: PlantnameDto): Promise<StatusOk> {
+    const fields = {
+      id: true,
+      plantname: true,
+      name: true,
+      createdAt: true,
+    };
+    let plant = await this.plantsRepository.findOne({
+      relations: ['followings', 'followers'],
+      where: { plantname: dto.plantname },
+      select: {
+        ...fields,
+        followers: { id: true },
+        followings: { id: true },
+      },
+    });
+
+    if (!plant) throw new BadRequestException('Plant does not exists');
+
+    return {
+      status: 201,
+      message: 'Fetched plant profile successfully',
+      data: {
+        ...pick(plant, ...(Object.keys(fields) as Array<keyof Plant>)),
+        followingsCount: plant.followings.length,
+        followersCount: plant.followers.length,
+      },
     };
   }
 
