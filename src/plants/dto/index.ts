@@ -2,5 +2,5 @@ export {
   ChangePasswordDto,
   UpdatePlantDto,
   DeletePlantDto,
-  ToggleFollowingDto,
+  PlantnameDto,
 } from './plants.dto';
