@@ -39,7 +39,7 @@ export class PlantsService {
     };
   }
 
-  async getProfile(dto: PlantnameDto): Promise<StatusOk> {
+  async getProfile(plantname: string): Promise<StatusOk> {
     const fields = {
       id: true,
       plantname: true,
@@ -48,7 +48,7 @@ export class PlantsService {
     };
     let plant = await this.plantsRepository.findOne({
       relations: ['followings', 'followers'],
-      where: { plantname: dto.plantname },
+      where: { plantname },
       select: {
         ...fields,
         followers: { id: true },
@@ -69,13 +69,11 @@ export class PlantsService {
     };
   }
 
-  async getFollowings(dto: PlantnameDto): Promise<StatusOk> {
+  async getFollowings(plantname: string): Promise<StatusOk> {
     let plant = await this.plantsRepository.findOne({
       relations: ['followings'],
-      where: { plantname: dto.plantname },
-      select: {
-        followings: { id: true, name: true, plantname: true },
-      },
+      where: { plantname },
+      select: { followings: { id: true, name: true, plantname: true } },
     });
 
     if (!plant) throw new BadRequestException('Plant does not exists');
@@ -87,13 +85,11 @@ export class PlantsService {
     };
   }
 
-  async getFollowers(dto: PlantnameDto): Promise<StatusOk> {
+  async getFollowers(plantname: string): Promise<StatusOk> {
     let plant = await this.plantsRepository.findOne({
       relations: ['followers'],
-      where: { plantname: dto.plantname },
-      select: {
-        followers: { id: true, name: true, plantname: true },
-      },
+      where: { plantname },
+      select: { followers: { id: true, name: true, plantname: true } },
     });
 
     if (!plant) throw new BadRequestException('Plant does not exists');
