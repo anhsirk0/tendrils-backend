@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { PlantsService } from './plants.service';
 import { Plantname } from './plant.decorator';
 
@@ -18,19 +18,19 @@ export class PlantsController {
     return this.plantsService.toggleFollowing(dto, name);
   }
 
-  @Get('profile')
-  getProfile(@Body() dto: PlantnameDto) {
-    return this.plantsService.getProfile(dto);
+  @Get('profile/:plantname')
+  getProfile(@Param('plantname') plantname: string) {
+    return this.plantsService.getProfile(plantname);
   }
 
-  @Get('followings')
-  getFollowings(@Body() dto: PlantnameDto) {
-    return this.plantsService.getFollowings(dto);
+  @Get('followings/:plantname')
+  getFollowings(@Param('plantname') plantname: string) {
+    return this.plantsService.getFollowings(plantname);
   }
 
-  @Get('followers')
-  getFollowers(@Body() dto: PlantnameDto) {
-    return this.plantsService.getFollowers(dto);
+  @Get('followers/:plantname')
+  getFollowers(@Param('plantname') plantname: string) {
+    return this.plantsService.getFollowers(plantname);
   }
 
   @Post('change-password')
