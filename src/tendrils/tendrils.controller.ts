@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Param } from '@nestjs/common';
 import { StatusOk } from 'src/types';
+import { Plantname } from 'src/plants/plant.decorator';
 
 import { TendrilsService } from './tendrils.service';
 import { AddCurlDto, CreateTendrilDto } from './dto';
@@ -10,8 +11,8 @@ export class TendrilsController {
   constructor(private tendrilsService: TendrilsService) {}
 
   @Post('create')
-  createTendril(@Body() dto: CreateTendrilDto): Promise<StatusOk> {
-    return this.tendrilsService.createTendril(dto);
+  createTendril(@Body() dto: CreateTendrilDto, @Plantname() name: string) {
+    return this.tendrilsService.createTendril(dto, name);
   }
 
   @Get('all/:plantname')
@@ -25,7 +26,7 @@ export class TendrilsController {
   }
 
   @Post('add-curl')
-  addCurl(@Body() dto: AddCurlDto): Promise<StatusOk> {
-    return this.tendrilsService.addCurl(dto);
+  addCurl(@Body() dto: AddCurlDto, @Plantname() plantname: string) {
+    return this.tendrilsService.addCurl(dto, plantname);
   }
 }

@@ -5,25 +5,15 @@ export class CreateTendrilDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  plantname: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   title: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  body: string;
+  content: string;
 }
 
 export class AddCurlDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  plantname: string;
-
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

@@ -24,7 +24,7 @@ export class Tendril {
   title: string;
 
   @Column()
-  body: string;
+  content: string;
 
   @Column()
   uuid: string;
