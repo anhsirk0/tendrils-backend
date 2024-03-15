@@ -10,6 +10,7 @@ import * as argon2 from 'argon2';
 import { Plant } from 'src/entities';
 import { StatusOk } from 'src/types';
 import { SigninDto, SignupDto } from './dto';
+import { pick } from 'src/helpers';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +44,7 @@ export class AuthService {
     return {
       status: 201,
       message: 'Login successful',
-      data: { name: plant.name, plantname: plant.plantname, token },
+      data: { ...pick(plant, 'id', 'name', 'plantname'), token },
     };
   }
 
