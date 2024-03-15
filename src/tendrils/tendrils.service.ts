@@ -7,6 +7,8 @@ import { StatusOk } from 'src/types';
 import { Tendril, Plant, Curl } from 'src/entities';
 import { AddCurlDto, CreateTendrilDto } from './dto';
 
+type Resp<T = any> = Promise<StatusOk<T>>;
+
 @Injectable()
 export class TendrilsService {
   constructor(
@@ -18,10 +20,8 @@ export class TendrilsService {
     private curlRepository: Repository<Curl>,
   ) {}
 
-  async createTendril(dto: CreateTendrilDto): Promise<StatusOk> {
-    let plant = await this.plantRepository.findOne({
-      where: { plantname: dto.plantname },
-    });
+  async createTendril(dto: CreateTendrilDto, plantname: string): Resp {
+    let plant = await this.plantRepository.findOne({ where: { plantname } });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
     let curl = this.curlRepository.create({ plant });
@@ -29,7 +29,7 @@ export class TendrilsService {
 
     let tendril = this.tendrilRepository.create({
       title: dto.title,
-      body: dto.body,
+      content: dto.content,
       plant,
       curls: [curl],
     });
@@ -41,18 +41,13 @@ export class TendrilsService {
     };
   }
 
-  async getAllTendrils(plantname: string): Promise<StatusOk> {
-    let plant: Plant = await this.plantRepository.findOne({
-      where: { plantname },
-    });
-
+  async getAllTendrils(plantname: string): Resp<Array<Tendril>> {
+    let plant = await this.plantRepository.findOne({ where: { plantname } });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
     let tendrils = await this.tendrilRepository.find({
       relations: ['curls'],
-      where: {
-        plant: { plantname },
-      },
+      where: { plant: { plantname } },
     });
 
     return {
@@ -76,10 +71,8 @@ export class TendrilsService {
     };
   }
 
-  async addCurl(dto: AddCurlDto): Promise<StatusOk> {
-    let plant = await this.plantRepository.findOne({
-      where: { plantname: dto.plantname },
-    });
+  async addCurl(dto: AddCurlDto, plantname: string): Resp {
+    let plant = await this.plantRepository.findOne({ where: { plantname } });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
     let tendril = await this.tendrilRepository.findOne({
@@ -100,10 +93,7 @@ export class TendrilsService {
       newCurls = newCurls.filter((c) => c.plant.uuid !== plant.uuid);
     }
 
-    tendril = await this.tendrilRepository.save({
-      ...tendril,
-      curls: newCurls,
-    });
+    await this.tendrilRepository.save({ ...tendril, curls: newCurls });
 
     return {
       status: 201,
