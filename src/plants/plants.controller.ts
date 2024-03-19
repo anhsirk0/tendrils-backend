@@ -1,36 +1,17 @@
 import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { PlantsService } from './plants.service';
 import { Plantname } from './plant.decorator';
-
-import {
-  UpdatePlantDto,
-  DeletePlantDto,
-  ChangePasswordDto,
-  PlantnameDto,
-} from './dto';
+import { UpdatePlantDto, DeletePlantDto, ChangePasswordDto } from './dto';
+import { Public } from 'src/auth/auth.guard';
 
 @Controller('plants')
 export class PlantsController {
   constructor(private plantsService: PlantsService) {}
 
-  @Post('toggle-follow')
-  toggleFollowing(@Body() dto: PlantnameDto, @Plantname() name: string) {
-    return this.plantsService.toggleFollowing(dto, name);
-  }
-
+  @Public()
   @Get('profile/:plantname')
-  getProfile(@Param('plantname') plantname: string) {
-    return this.plantsService.getProfile(plantname);
-  }
-
-  @Get('followings/:plantname')
-  getFollowings(@Param('plantname') plantname: string) {
-    return this.plantsService.getFollowings(plantname);
-  }
-
-  @Get('followers/:plantname')
-  getFollowers(@Param('plantname') plantname: string) {
-    return this.plantsService.getFollowers(plantname);
+  getProfile(@Param('plantname') plantname: string, @Plantname() name: string) {
+    return this.plantsService.getProfile(plantname, name);
   }
 
   @Post('change-password')

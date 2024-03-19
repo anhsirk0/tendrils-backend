@@ -3,20 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
 import { pick } from 'src/helpers';
-import { Plant } from 'src/entities';
+import { Plant, Follow } from 'src/entities';
 import { StatusOk } from 'src/types';
-import {
-  UpdatePlantDto,
-  DeletePlantDto,
-  ChangePasswordDto,
-  PlantnameDto,
-} from './dto';
+import { UpdatePlantDto, DeletePlantDto, ChangePasswordDto } from './dto';
 
 @Injectable()
 export class PlantsService {
   constructor(
     @InjectRepository(Plant)
     private plantsRepository: Repository<Plant>,
+    @InjectRepository(Follow)
+    private followRepository: Repository<Follow>,
   ) {}
 
   async updatePlant(dto: UpdatePlantDto, name: string): Promise<StatusOk> {
@@ -39,7 +36,9 @@ export class PlantsService {
     };
   }
 
-  async getProfile(plantname: string): Promise<StatusOk> {
+  async getProfile(plantname: string, name?: string): Promise<StatusOk> {
+    console.log(name);
+
     const fields = {
       id: true,
       plantname: true,
@@ -47,12 +46,10 @@ export class PlantsService {
       createdAt: true,
     };
     let plant = await this.plantsRepository.findOne({
-      relations: ['followings', 'followers'],
+      relations: ['following', 'followers'],
       where: { plantname },
       select: {
         ...fields,
-        followers: { id: true },
-        followings: { id: true },
       },
     });
 
@@ -63,76 +60,10 @@ export class PlantsService {
       message: 'Fetched plant profile successfully',
       data: {
         ...pick(plant, ...(Object.keys(fields) as Array<keyof Plant>)),
-        followingsCount: plant.followings.length,
+        followingCount: plant.following.length,
         followersCount: plant.followers.length,
+        // isFollowed: name ?
       },
-    };
-  }
-
-  async getFollowings(plantname: string): Promise<StatusOk> {
-    let plant = await this.plantsRepository.findOne({
-      relations: ['followings'],
-      where: { plantname },
-      select: { followings: { id: true, name: true, plantname: true } },
-    });
-
-    if (!plant) throw new BadRequestException('Plant does not exists');
-
-    return {
-      status: 201,
-      message: 'Fetched followings successfully',
-      data: { plantname: plant.plantname, followings: plant.followings },
-    };
-  }
-
-  async getFollowers(plantname: string): Promise<StatusOk> {
-    let plant = await this.plantsRepository.findOne({
-      relations: ['followers'],
-      where: { plantname },
-      select: { followers: { id: true, name: true, plantname: true } },
-    });
-
-    if (!plant) throw new BadRequestException('Plant does not exists');
-
-    return {
-      status: 201,
-      message: 'Fetched followers successfully',
-      data: { plantname: plant.plantname, followers: plant.followers },
-    };
-  }
-
-  async toggleFollowing(dto: PlantnameDto, name: string): Promise<StatusOk> {
-    let plant = await this.plantsRepository.findOne({
-      relations: ['followings'],
-      where: { plantname: name },
-    });
-    if (!plant) throw new BadRequestException('Plant does not exists');
-
-    let followee = await this.plantsRepository.findOne({
-      where: { plantname: dto.plantname },
-    });
-    if (!followee)
-      throw new BadRequestException(`Plant "${dto.plantname}" does not exists`);
-
-    const isFolloweeFn = (p: Plant) => p.plantname === dto.plantname;
-    const isAlreadyFollowing = plant.followings.some(isFolloweeFn);
-
-    const followings = isAlreadyFollowing
-      ? plant.followings.filter((p) => !isFolloweeFn(p))
-      : [followee].concat(plant.followings);
-
-    plant = await this.plantsRepository.save({
-      ...plant,
-      followings,
-      updatedAt: new Date().valueOf(),
-    });
-
-    return {
-      status: 201,
-      message:
-        (isAlreadyFollowing ? 'Unf' : 'F') +
-        `ollowed ${followee.plantname} successfully`,
-      data: { name: followee.name, plantname: followee.plantname },
     };
   }
 

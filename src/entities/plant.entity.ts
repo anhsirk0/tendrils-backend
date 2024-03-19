@@ -4,11 +4,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
-  ManyToOne,
 } from 'typeorm';
 import * as argon2 from 'argon2';
 import { nanoid } from 'nanoid';
-import { Tendril, Curl } from './';
+import { Tendril, Curl, Follow } from './';
 
 @Entity()
 export class Plant {
@@ -33,11 +32,11 @@ export class Plant {
   @OneToMany(() => Curl, (curl) => curl.plant, { cascade: true })
   curls: Array<Curl>;
 
-  @ManyToOne(() => Plant, (plant) => plant.followings)
-  followers: Array<Plant>;
+  @OneToMany(() => Follow, (follow) => follow.from, { cascade: true })
+  following: Array<Follow>;
 
-  @OneToMany(() => Plant, (plant) => plant.followers)
-  followings: Array<Plant>;
+  @OneToMany(() => Follow, (follow) => follow.to, { cascade: true })
+  followers: Array<Follow>;
 
   @Column({ name: 'created_at', default: () => new Date().valueOf() })
   createdAt: number;
@@ -54,10 +53,4 @@ export class Plant {
   createUuid() {
     this.uuid = nanoid();
   }
-
-  // @BeforeInsert()
-  // addEmpty() {
-  //   this.followers = [];
-  //   this.followings = [];
-  // }
 }
