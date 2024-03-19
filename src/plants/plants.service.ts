@@ -37,8 +37,6 @@ export class PlantsService {
   }
 
   async getProfile(plantname: string, name?: string): Promise<StatusOk> {
-    console.log(name);
-
     const fields = {
       id: true,
       plantname: true,
@@ -46,11 +44,12 @@ export class PlantsService {
       createdAt: true,
     };
     let plant = await this.plantsRepository.findOne({
-      relations: ['following', 'followers'],
-      where: { plantname },
-      select: {
-        ...fields,
+      relations: {
+        followers: { from: true },
+        following: true,
       },
+      where: { plantname },
+      select: { ...fields, followers: { from: { plantname: true } } },
     });
 
     if (!plant) throw new BadRequestException('Plant does not exists');
@@ -62,7 +61,9 @@ export class PlantsService {
         ...pick(plant, ...(Object.keys(fields) as Array<keyof Plant>)),
         followingCount: plant.following.length,
         followersCount: plant.followers.length,
-        // isFollowed: name ?
+        isFollowed: name
+          ? plant.followers.some((f) => f.from.plantname === name)
+          : false,
       },
     };
   }

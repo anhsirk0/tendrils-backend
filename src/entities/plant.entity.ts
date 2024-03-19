@@ -32,10 +32,16 @@ export class Plant {
   @OneToMany(() => Curl, (curl) => curl.plant, { cascade: true })
   curls: Array<Curl>;
 
-  @OneToMany(() => Follow, (follow) => follow.from, { cascade: true })
+  @OneToMany(() => Follow, (follow) => follow.from, {
+    cascade: true,
+    eager: true,
+  })
   following: Array<Follow>;
 
-  @OneToMany(() => Follow, (follow) => follow.to, { cascade: true })
+  @OneToMany(() => Follow, (follow) => follow.to, {
+    cascade: true,
+    eager: true,
+  })
   followers: Array<Follow>;
 
   @Column({ name: 'created_at', default: () => new Date().valueOf() })
