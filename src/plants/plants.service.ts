@@ -47,9 +47,14 @@ export class PlantsService {
       relations: {
         followers: { from: true },
         following: true,
+        tendrils: true,
       },
       where: { plantname },
-      select: { ...fields, followers: { from: { plantname: true } } },
+      select: {
+        ...fields,
+        tendrils: { id: true },
+        followers: { from: { plantname: true } },
+      },
     });
 
     if (!plant) throw new BadRequestException('Plant does not exists');
@@ -61,6 +66,7 @@ export class PlantsService {
         ...pick(plant, ...(Object.keys(fields) as Array<keyof Plant>)),
         followingCount: plant.following.length,
         followersCount: plant.followers.length,
+        tendrilsCount: plant.tendrils.length,
         isFollowed: name
           ? plant.followers.some((f) => f.from.plantname === name)
           : false,
