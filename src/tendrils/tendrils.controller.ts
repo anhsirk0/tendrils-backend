@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { StatusOk } from 'src/types';
 import { Plantname } from 'src/plants/plant.decorator';
-
 import { TendrilsService } from './tendrils.service';
 import { AddCurlDto, CreateTendrilDto } from './dto';
 import { Tendril } from 'src/entities';
+import { Pagination } from 'src/paginate';
+import { Some } from 'src/helpers';
 
 @Controller('tendrils')
 export class TendrilsController {
@@ -16,8 +18,14 @@ export class TendrilsController {
   }
 
   @Get('all/:plantname')
-  getAllTendrils(@Param('plantname') plantname: string): Promise<StatusOk> {
-    return this.tendrilsService.getAllTendrils(plantname);
+  getAllTendrils(
+    @Param('plantname') plantname: string,
+    @Req() request: Request,
+  ): Promise<StatusOk<Pagination<Tendril>>> {
+    return this.tendrilsService.getAllTendrils(plantname, {
+      take: Some.Number(request.query?.take, 10),
+      skip: Some.Number(request.query?.skip),
+    });
   }
 
   @Get(':uuid')
@@ -25,8 +33,8 @@ export class TendrilsController {
     return this.tendrilsService.getTendrilByUuid(uuid);
   }
 
-  @Post('add-curl')
-  addCurl(@Body() dto: AddCurlDto, @Plantname() plantname: string) {
-    return this.tendrilsService.addCurl(dto, plantname);
-  }
+  // @Post('add-curl')
+  // addCurl(@Body() dto: AddCurlDto, @Plantname() plantname: string) {
+  //   return this.tendrilsService.addCurl(dto, plantname);
+  // }
 }

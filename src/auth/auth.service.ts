@@ -56,7 +56,7 @@ export class AuthService {
 
     if (plant) throw new BadRequestException('Account already exists');
 
-    plant = this.plantsRepository.create(dto);
+    plant = this.plantsRepository.create({ ...dto, bio: '', avatarUrl: '' });
     plant = await this.plantsRepository.save(plant);
 
     return {

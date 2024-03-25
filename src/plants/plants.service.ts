@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
 import { pick } from 'src/helpers';
-import { Plant, Follow } from 'src/entities';
+import { Plant } from 'src/entities';
 import { StatusOk } from 'src/types';
 import { UpdatePlantDto, DeletePlantDto, ChangePasswordDto } from './dto';
 
@@ -12,8 +12,6 @@ export class PlantsService {
   constructor(
     @InjectRepository(Plant)
     private plantsRepository: Repository<Plant>,
-    @InjectRepository(Follow)
-    private followRepository: Repository<Follow>,
   ) {}
 
   async updatePlant(dto: UpdatePlantDto, name: string): Promise<StatusOk> {
@@ -44,6 +42,7 @@ export class PlantsService {
       createdAt: true,
     };
     let plant = await this.plantsRepository.findOne({
+      // relations: ['followers', 'following', 'tendrils'],
       relations: {
         followers: { from: true },
         following: true,

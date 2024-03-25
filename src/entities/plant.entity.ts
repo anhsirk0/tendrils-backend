@@ -21,6 +21,12 @@ export class Plant {
   plantname: string;
 
   @Column()
+  bio: string;
+
+  @Column()
+  avatarUrl: string;
+
+  @Column()
   password: string;
 
   @Column()
@@ -29,13 +35,10 @@ export class Plant {
   @OneToMany(() => Tendril, (tendril) => tendril.plant, { cascade: true })
   tendrils: Array<Tendril>;
 
-  @OneToMany(() => Curl, (curl) => curl.plant, { cascade: true })
+  @OneToMany(() => Curl, (curl) => curl.plantname, { cascade: true })
   curls: Array<Curl>;
 
-  @OneToMany(() => Follow, (follow) => follow.from, {
-    cascade: true,
-    eager: true,
-  })
+  @OneToMany(() => Follow, (follow) => follow.from, { cascade: true })
   following: Array<Follow>;
 
   @OneToMany(() => Follow, (follow) => follow.to, {

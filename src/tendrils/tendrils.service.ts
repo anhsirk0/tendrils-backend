@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { StatusOk } from 'src/types';
 import { Tendril, Plant, Curl } from 'src/entities';
 import { AddCurlDto, CreateTendrilDto } from './dto';
+import { Pagination, PaginationOptions } from 'src/paginate';
 
 type Resp<T = any> = Promise<StatusOk<T>>;
 
@@ -24,16 +25,17 @@ export class TendrilsService {
     let plant = await this.plantRepository.findOne({ where: { plantname } });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
-    let curl = this.curlRepository.create({ plant });
-    curl = await this.curlRepository.save(curl);
-
     let tendril = this.tendrilRepository.create({
       title: dto.title,
       content: dto.content,
       plant,
-      curls: [curl],
     });
     tendril = await this.tendrilRepository.save(tendril);
+    let curl = this.curlRepository.create({
+      plantname: plant.plantname,
+      tendril,
+    });
+    curl = await this.curlRepository.save(curl);
 
     return {
       status: 201,
@@ -41,19 +43,25 @@ export class TendrilsService {
     };
   }
 
-  async getAllTendrils(plantname: string): Resp<Array<Tendril>> {
+  async getAllTendrils(
+    plantname: string,
+    options: PaginationOptions,
+  ): Resp<Pagination<Tendril>> {
     let plant = await this.plantRepository.findOne({ where: { plantname } });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
-    let tendrils = await this.tendrilRepository.find({
-      relations: ['curls'],
+    const [data, total] = await this.tendrilRepository.findAndCount({
+      take: options.take,
+      skip: options.skip,
       where: { plant: { plantname } },
+      relations: { curls: true },
+      select: { curls: { plantname: true } },
     });
 
     return {
       status: 200,
       message: `Retrieved all tendrils for '${plant.plantname}'`,
-      data: tendrils,
+      data: new Pagination<Tendril>({ data, total }),
     };
   }
 
@@ -68,36 +76,6 @@ export class TendrilsService {
       status: 200,
       message: 'Retrieved tendril successfully',
       data: tendril,
-    };
-  }
-
-  async addCurl(dto: AddCurlDto, plantname: string): Resp {
-    let plant = await this.plantRepository.findOne({ where: { plantname } });
-    if (!plant) throw new BadRequestException('Plant does not exists');
-
-    let tendril = await this.tendrilRepository.findOne({
-      relations: ['curls', 'curls.plant'],
-      where: { uuid: dto.tendrilUuid },
-    });
-    if (!tendril) throw new BadRequestException('Tendril does not exists');
-
-    let newCurls = tendril.curls;
-    let curl = await this.curlRepository.findOne({
-      where: { plant: { uuid: plant.uuid }, tendril: { uuid: tendril.uuid } },
-    });
-    if (!curl) {
-      curl = this.curlRepository.create({ plant });
-      curl = await this.curlRepository.save(curl);
-      newCurls = [curl, ...tendril.curls];
-    } else {
-      newCurls = newCurls.filter((c) => c.plant.uuid !== plant.uuid);
-    }
-
-    await this.tendrilRepository.save({ ...tendril, curls: newCurls });
-
-    return {
-      status: 201,
-      message: `Tendril '${dto.tendrilUuid}' curled successfully`,
     };
   }
 }

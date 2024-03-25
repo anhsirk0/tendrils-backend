@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { pick } from 'src/helpers';
 import { Plant, Follow } from 'src/entities';
 import { StatusOk } from 'src/types';
 import { PlantnameDto } from 'src/plants/dto';

@@ -17,7 +17,9 @@ export class Tendril {
   @ManyToOne(() => Plant, (plant) => plant.tendrils)
   plant: Plant;
 
-  @OneToMany(() => Curl, (curl) => curl.tendril, { cascade: true })
+  @OneToMany(() => Curl, (curl) => curl.tendril, {
+    cascade: true,
+  })
   curls: Array<Curl>;
 
   @Column({ length: 80 })
