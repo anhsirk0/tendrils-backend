@@ -12,10 +12,3 @@ export class CreateTendrilDto {
   @IsNotEmpty()
   content: string;
 }
-
-export class AddCurlDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  tendrilUuid: string;
-}

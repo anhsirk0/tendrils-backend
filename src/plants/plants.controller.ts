@@ -2,7 +2,7 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { PlantsService } from './plants.service';
 import { Plantname } from './plant.decorator';
 import { UpdatePlantDto, DeletePlantDto, ChangePasswordDto } from './dto';
-import { Public, Independent } from 'src/auth/auth.guard';
+import { Independent } from 'src/auth/auth.guard';
 
 @Controller('plants')
 export class PlantsController {

@@ -1,1 +1,1 @@
-export { CreateTendrilDto, AddCurlDto } from './tendrils.dto';
+export { CreateTendrilDto } from './tendrils.dto';

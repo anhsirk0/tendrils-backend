@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 
 // local imports
 import { StatusOk } from 'src/types';
-import { Tendril, Plant, Curl } from 'src/entities';
-import { AddCurlDto, CreateTendrilDto } from './dto';
+import { Tendril, Plant, Curl, Follow } from 'src/entities';
+import { CreateTendrilDto } from './dto';
 import { Pagination, PaginationOptions } from 'src/paginate';
 
 type Resp<T = any> = Promise<StatusOk<T>>;
@@ -19,6 +19,8 @@ export class TendrilsService {
     private plantRepository: Repository<Plant>,
     @InjectRepository(Curl)
     private curlRepository: Repository<Curl>,
+    @InjectRepository(Follow)
+    private followRepository: Repository<Follow>,
   ) {}
 
   async createTendril(dto: CreateTendrilDto, plantname: string): Resp {
@@ -61,6 +63,33 @@ export class TendrilsService {
     return {
       status: 200,
       message: `Retrieved all tendrils for '${plant.plantname}'`,
+      data: new Pagination<Tendril>({ data, total }),
+    };
+  }
+
+  async getFeed(
+    plantname: string,
+    options: PaginationOptions,
+  ): Resp<Pagination<Tendril>> {
+    let following = await this.followRepository.find({
+      where: { from: { plantname } },
+      relations: { to: true },
+      select: { id: true, to: { plantname: true } },
+    });
+
+    const names = following.map((f) => f.to.plantname);
+
+    const [data, total] = await this.tendrilRepository.findAndCount({
+      take: options.take,
+      skip: options.skip,
+      where: { plant: { plantname: In(names) } },
+      relations: { curls: true },
+      select: { curls: { plantname: true } },
+    });
+
+    return {
+      status: 200,
+      message: `Retrieved feed for '${plantname}'`,
       data: new Pagination<Tendril>({ data, total }),
     };
   }
