@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import * as argon2 from 'argon2';
 import { nanoid } from 'nanoid';
-import { Tendril, Curl, Follow } from './';
+import { Tendril, Curl, Follow, Comment } from './';
 
 @Entity()
 export class Plant {
@@ -37,6 +37,9 @@ export class Plant {
 
   @OneToMany(() => Curl, (curl) => curl.plantname, { cascade: true })
   curls: Array<Curl>;
+
+  @OneToMany(() => Comment, (comment) => comment.plantname, { cascade: true })
+  comments: Array<Comment>;
 
   @OneToMany(() => Follow, (follow) => follow.from, { cascade: true })
   following: Array<Follow>;

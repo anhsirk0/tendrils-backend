@@ -2,7 +2,6 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { FollowsService } from './follows.service';
 import { Plantname } from 'src/plants/plant.decorator';
 import { PlantnameDto } from 'src/plants/dto';
-import { Public } from 'src/auth/auth.guard';
 
 @Controller('follows')
 export class FollowsController {

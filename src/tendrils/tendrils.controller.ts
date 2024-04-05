@@ -8,6 +8,7 @@ import { Tendril } from 'src/entities';
 import { Pagination } from 'src/paginate';
 import { Some } from 'src/helpers';
 import { Independent } from 'src/auth/auth.guard';
+import { FeedTendril } from './types';
 
 @Controller('tendrils')
 export class TendrilsController {
@@ -34,7 +35,7 @@ export class TendrilsController {
   getFeed(
     @Plantname() name: string,
     @Req() request: Request,
-  ): Promise<StatusOk<Pagination<Tendril>>> {
+  ): Promise<StatusOk<Pagination<FeedTendril>>> {
     return this.tendrilsService.getFeed(name, {
       take: Some.Number(request.query?.take, 10),
       skip: Some.Number(request.query?.skip),

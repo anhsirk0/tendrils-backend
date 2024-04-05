@@ -7,6 +7,7 @@ import { StatusOk } from 'src/types';
 import { Tendril, Plant, Curl, Follow } from 'src/entities';
 import { CreateTendrilDto } from './dto';
 import { Pagination, PaginationOptions } from 'src/paginate';
+import { FeedTendril } from './types';
 
 type Resp<T = any> = Promise<StatusOk<T>>;
 
@@ -67,10 +68,7 @@ export class TendrilsService {
     };
   }
 
-  async getFeed(
-    plantname: string,
-    options: PaginationOptions,
-  ): Resp<Pagination<Tendril>> {
+  async getFeed(plantname: string, options: PaginationOptions) {
     let following = await this.followRepository.find({
       where: { from: { plantname } },
       relations: { to: true },
@@ -79,26 +77,29 @@ export class TendrilsService {
 
     const names = following.map((f) => f.to.plantname);
 
-    const [data, total] = await this.tendrilRepository.findAndCount({
+    const [result, total] = await this.tendrilRepository.findAndCount({
       take: options.take,
       skip: options.skip,
       where: { plant: { plantname: In(names) } },
-      relations: { curls: true },
+      relations: { curls: true, comments: true },
       select: { curls: { plantname: true } },
+    });
+
+    const data = result.map((tendril) => {
+      let ft = { ...tendril, commentsCount: tendril.comments.length };
+      delete ft.comments;
+      return ft;
     });
 
     return {
       status: 200,
       message: `Retrieved feed for '${plantname}'`,
-      data: new Pagination<Tendril>({ data, total }),
+      data: new Pagination<FeedTendril>({ data, total }),
     };
   }
 
   async getTendrilByUuid(uuid: string): Promise<StatusOk<Tendril>> {
-    let tendril = await this.tendrilRepository.findOne({
-      where: { uuid },
-    });
-
+    let tendril = await this.tendrilRepository.findOne({ where: { uuid } });
     if (!tendril) throw new BadRequestException('Tendril does not exists');
 
     return {

@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { nanoid } from 'nanoid';
-import { Plant, Curl } from './';
+import { Plant, Curl, Comment } from './';
 
 @Entity()
 export class Tendril {
@@ -17,10 +17,11 @@ export class Tendril {
   @ManyToOne(() => Plant, (plant) => plant.tendrils)
   plant: Plant;
 
-  @OneToMany(() => Curl, (curl) => curl.tendril, {
-    cascade: true,
-  })
+  @OneToMany(() => Curl, (curl) => curl.tendril, { cascade: true })
   curls: Array<Curl>;
+
+  @OneToMany(() => Comment, (comment) => comment.tendril, { cascade: true })
+  comments: Array<Comment>;
 
   @Column({ length: 80 })
   title: string;
