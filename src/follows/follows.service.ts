@@ -4,24 +4,25 @@ import { Repository } from 'typeorm';
 import { Plant, Follow } from 'src/entities';
 import { StatusOk } from 'src/types';
 import { PlantnameDto } from 'src/plants/dto';
+import { pick } from 'src/helpers';
 
 @Injectable()
 export class FollowsService {
   constructor(
     @InjectRepository(Plant)
-    private plantsRepository: Repository<Plant>,
+    private plantRepository: Repository<Plant>,
     @InjectRepository(Follow)
     private followRepository: Repository<Follow>,
   ) {}
 
   async toggleFollowing(dto: PlantnameDto, name: string): Promise<StatusOk> {
-    let followFrom = await this.plantsRepository.findOne({
+    let followFrom = await this.plantRepository.findOne({
       relations: ['following'],
       where: { plantname: name },
     });
     if (!followFrom) throw new BadRequestException('Plant does not exists');
 
-    let followTo = await this.plantsRepository.findOne({
+    let followTo = await this.plantRepository.findOne({
       where: { plantname: dto.plantname },
     });
     if (!followTo)
@@ -55,9 +56,15 @@ export class FollowsService {
     };
   }
 
-  async getFollowing(plantname: string): Promise<StatusOk> {
-    let following = await this.followRepository.find({
+  async getFollowing(plantname: string, name: string): Promise<StatusOk> {
+    let meFollowing = await this.followRepository.find({
       where: { from: { plantname } },
+      relations: ['to'],
+      select: { id: false, to: { id: true, name: true, plantname: true } },
+    });
+
+    let following = await this.followRepository.find({
+      where: { from: { plantname: name } },
       relations: ['to'],
       select: { id: false, to: { id: true, name: true, plantname: true } },
     });
@@ -67,14 +74,24 @@ export class FollowsService {
       message: 'Fetched following successfully',
       data: {
         plantname,
-        following: following.map((f) => ({ ...f.to, createdAt: f.createdAt })),
+        following: following.map((f) => ({
+          ...pick(f.to, 'id', 'name', 'plantname'),
+          createdAt: f.createdAt,
+          isFollowed: meFollowing.some((pf) => pf.to.id === f.to.id),
+          isMe: f.to.plantname === plantname,
+        })),
       },
     };
   }
 
-  async getFollowers(plantname: string): Promise<StatusOk> {
-    let followers = await this.followRepository.find({
+  async getFollowers(plantname: string, name: string): Promise<StatusOk> {
+    let meFollowers = await this.followRepository.find({
       where: { to: { plantname } },
+      relations: ['from'],
+      select: { id: false, from: { id: true, name: true, plantname: true } },
+    });
+    let followers = await this.followRepository.find({
+      where: { to: { plantname: name } },
       relations: ['from'],
       select: { id: false, from: { id: true, name: true, plantname: true } },
     });
@@ -85,8 +102,10 @@ export class FollowsService {
       data: {
         plantname,
         followers: followers.map((f) => ({
-          ...f.from,
+          ...pick(f.from, 'id', 'name', 'plantname'),
           createdAt: f.createdAt,
+          isFollowed: meFollowers.some((pf) => pf.from.id === f.from.id),
+          isMe: f.from.plantname === plantname,
         })),
       },
     };

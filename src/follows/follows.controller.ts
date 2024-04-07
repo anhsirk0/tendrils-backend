@@ -13,12 +13,18 @@ export class FollowsController {
   }
 
   @Get('following/:plantname')
-  getFollowing(@Param('plantname') plantname: string) {
-    return this.followsService.getFollowing(plantname);
+  getFollowing(
+    @Plantname() plantname: string,
+    @Param('plantname') name: string,
+  ) {
+    return this.followsService.getFollowing(plantname, name);
   }
 
   @Get('followers/:plantname')
-  getFollowers(@Param('plantname') plantname: string) {
-    return this.followsService.getFollowers(plantname);
+  getFollowers(
+    @Plantname() plantname: string,
+    @Param('plantname') name: string,
+  ) {
+    return this.followsService.getFollowers(plantname, name);
   }
 }

@@ -66,6 +66,7 @@ export class PlantsService {
         followingCount: plant.following.length,
         followersCount: plant.followers.length,
         tendrilsCount: plant.tendrils.length,
+        isMe: name === plantname,
         isFollowed: name
           ? plant.followers.some((f) => f.from.plantname === name)
           : false,
