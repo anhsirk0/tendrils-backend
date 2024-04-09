@@ -1,4 +1,4 @@
-import { Tendril, Curl } from 'src/entities';
+import { Tendril, Curl, Plant } from 'src/entities';
 
 export interface FeedTendril
   extends Pick<
@@ -7,4 +7,5 @@ export interface FeedTendril
   > {
   commentsCount: number;
   curls: Array<Pick<Curl, 'plantname'>>;
+  author: Pick<Plant, 'name' | 'plantname'>;
 }

@@ -24,7 +24,7 @@ export class TendrilsController {
   getAllTendrils(
     @Param('plantname') plantname: string,
     @Req() request: Request,
-  ): Promise<StatusOk<Pagination<Tendril>>> {
+  ) {
     return this.tendrilsService.getAllTendrils(plantname, {
       take: Some.Number(request.query?.take, 10),
       skip: Some.Number(request.query?.skip),

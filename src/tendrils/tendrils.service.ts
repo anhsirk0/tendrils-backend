@@ -46,25 +46,30 @@ export class TendrilsService {
     };
   }
 
-  async getAllTendrils(
-    plantname: string,
-    options: PaginationOptions,
-  ): Resp<Pagination<Tendril>> {
+  async getAllTendrils(plantname: string, options: PaginationOptions) {
     let plant = await this.plantRepository.findOne({ where: { plantname } });
     if (!plant) throw new BadRequestException('Plant does not exists');
 
-    const [data, total] = await this.tendrilRepository.findAndCount({
+    const [result, total] = await this.tendrilRepository.findAndCount({
       take: options.take,
       skip: options.skip,
       where: { plant: { plantname } },
-      relations: { curls: true },
+      relations: { curls: true, comments: true },
       select: { curls: { plantname: true } },
+    });
+    const data = result.map((tendril) => {
+      let ft = {
+        ...tendril,
+        commentsCount: tendril.comments.length,
+      };
+      delete ft.comments;
+      return ft;
     });
 
     return {
       status: 200,
       message: `Retrieved all tendrils for '${plant.plantname}'`,
-      data: new Pagination<Tendril>({ data, total }),
+      data: new Pagination({ data, total }),
     };
   }
 
@@ -81,13 +86,21 @@ export class TendrilsService {
       take: options.take,
       skip: options.skip,
       where: { plant: { plantname: In(names) } },
-      relations: { curls: true, comments: true },
+      relations: { curls: true, comments: true, plant: true },
       select: { curls: { plantname: true } },
     });
 
     const data = result.map((tendril) => {
-      let ft = { ...tendril, commentsCount: tendril.comments.length };
+      let ft = {
+        ...tendril,
+        commentsCount: tendril.comments.length,
+        author: {
+          name: tendril.plant.name,
+          plantname: tendril.plant.plantname,
+        },
+      };
       delete ft.comments;
+      delete ft.plant;
       return ft;
     });
 
