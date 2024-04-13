@@ -43,7 +43,9 @@ export class TendrilsController {
   }
 
   @Get(':uuid')
-  getTendrilByUuid(@Param('uuid') uuid: string): Promise<StatusOk<Tendril>> {
+  getTendrilByUuid(
+    @Param('uuid') uuid: string,
+  ): Promise<StatusOk<FeedTendril>> {
     return this.tendrilsService.getTendrilByUuid(uuid);
   }
 

@@ -8,6 +8,7 @@ import { Tendril, Plant, Curl, Follow } from 'src/entities';
 import { CreateTendrilDto } from './dto';
 import { Pagination, PaginationOptions } from 'src/paginate';
 import { FeedTendril } from './types';
+import { toFeedTendril } from './helpers';
 
 type Resp<T = any> = Promise<StatusOk<T>>;
 
@@ -88,21 +89,10 @@ export class TendrilsService {
       where: { plant: { plantname: In(names) } },
       relations: { curls: true, comments: true, plant: true },
       select: { curls: { plantname: true } },
+      order: { createdAt: 'DESC' },
     });
 
-    const data = result.map((tendril) => {
-      let ft = {
-        ...tendril,
-        commentsCount: tendril.comments.length,
-        author: {
-          name: tendril.plant.name,
-          plantname: tendril.plant.plantname,
-        },
-      };
-      delete ft.comments;
-      delete ft.plant;
-      return ft;
-    });
+    const data = result.map(toFeedTendril);
 
     return {
       status: 200,
@@ -111,14 +101,18 @@ export class TendrilsService {
     };
   }
 
-  async getTendrilByUuid(uuid: string): Promise<StatusOk<Tendril>> {
-    let tendril = await this.tendrilRepository.findOne({ where: { uuid } });
+  async getTendrilByUuid(uuid: string): Promise<StatusOk<FeedTendril>> {
+    let tendril = await this.tendrilRepository.findOne({
+      where: { uuid },
+      relations: { curls: true, comments: true, plant: true },
+      select: { curls: { plantname: true } },
+    });
     if (!tendril) throw new BadRequestException('Tendril does not exists');
 
     return {
       status: 200,
       message: 'Retrieved tendril successfully',
-      data: tendril,
+      data: toFeedTendril(tendril),
     };
   }
 }
