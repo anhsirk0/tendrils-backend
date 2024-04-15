@@ -115,14 +115,8 @@ export class TendrilsService {
   }
 
   async toggleCurl(plantname: string, uuid: string) {
-    let tendril = await this.tendrilRepository.findOne({
-      where: { uuid },
-      relations: { curls: true },
-      select: { curls: { plantname: true } },
-    });
+    let tendril = await this.tendrilRepository.findOne({ where: { uuid } });
     if (!tendril) throw new BadRequestException('Tendril does not exists');
-
-    console.log(tendril.curls);
 
     let curl = await this.curlRepository.findOne({
       where: { plantname, tendril: { uuid } },
@@ -137,7 +131,7 @@ export class TendrilsService {
     return {
       status: 201,
       message: (!curl ? 'C' : 'Unc') + `urled ${uuid} successfully`,
-      data: { plantname, uuid },
+      data: { plantname, uuid, isCurled: !curl },
     };
   }
 }
