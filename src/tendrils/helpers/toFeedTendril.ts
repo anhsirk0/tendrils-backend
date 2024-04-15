@@ -4,6 +4,7 @@ import { FeedTendril } from '../types';
 function toFeedTendril(tendril: Tendril): FeedTendril {
   let ft = {
     ...tendril,
+    curls: tendril.curls.map((c) => c.plantname),
     commentsCount: tendril.comments.length,
     author: {
       name: tendril.plant.name,

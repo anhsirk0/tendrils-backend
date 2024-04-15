@@ -49,8 +49,8 @@ export class TendrilsController {
     return this.tendrilsService.getTendrilByUuid(uuid);
   }
 
-  // @Post('add-curl')
-  // addCurl(@Body() dto: AddCurlDto, @Plantname() plantname: string) {
-  //   return this.tendrilsService.addCurl(dto, plantname);
-  // }
+  @Post('toggle-curl/:uuid')
+  toggleCurl(@Plantname() plantname: string, @Param('uuid') uuid: string) {
+    return this.tendrilsService.toggleCurl(plantname, uuid);
+  }
 }

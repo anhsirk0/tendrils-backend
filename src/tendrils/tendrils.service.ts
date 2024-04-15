@@ -56,11 +56,11 @@ export class TendrilsService {
       skip: options.skip,
       where: { plant: { plantname } },
       relations: { curls: true, comments: true },
-      select: { curls: { plantname: true } },
     });
     const data = result.map((tendril) => {
       let ft = {
         ...tendril,
+        curls: tendril.curls.map((c) => c.plantname),
         commentsCount: tendril.comments.length,
       };
       delete ft.comments;
@@ -88,7 +88,6 @@ export class TendrilsService {
       skip: options.skip,
       where: { plant: { plantname: In(names) } },
       relations: { curls: true, comments: true, plant: true },
-      select: { curls: { plantname: true } },
       order: { createdAt: 'DESC' },
     });
 
@@ -105,7 +104,6 @@ export class TendrilsService {
     let tendril = await this.tendrilRepository.findOne({
       where: { uuid },
       relations: { curls: true, comments: true, plant: true },
-      select: { curls: { plantname: true } },
     });
     if (!tendril) throw new BadRequestException('Tendril does not exists');
 
@@ -113,6 +111,33 @@ export class TendrilsService {
       status: 200,
       message: 'Retrieved tendril successfully',
       data: toFeedTendril(tendril),
+    };
+  }
+
+  async toggleCurl(plantname: string, uuid: string) {
+    let tendril = await this.tendrilRepository.findOne({
+      where: { uuid },
+      relations: { curls: true },
+      select: { curls: { plantname: true } },
+    });
+    if (!tendril) throw new BadRequestException('Tendril does not exists');
+
+    console.log(tendril.curls);
+
+    let curl = await this.curlRepository.findOne({
+      where: { plantname, tendril: { uuid } },
+    });
+
+    if (curl) {
+      await this.curlRepository.remove(curl);
+    } else {
+      const newCurl = this.curlRepository.create({ plantname, tendril });
+      await this.curlRepository.save(newCurl);
+    }
+    return {
+      status: 201,
+      message: (!curl ? 'C' : 'Unc') + `urled ${uuid} successfully`,
+      data: { plantname, uuid },
     };
   }
 }
