@@ -12,7 +12,7 @@ export class Comment {
   @Column()
   content: string;
 
-  @ManyToOne(() => Tendril, (tendril) => tendril.curls)
+  @ManyToOne(() => Tendril, (tendril) => tendril.comments)
   tendril: Tendril;
 
   @Column({ name: 'created_at', default: () => new Date().valueOf() })
