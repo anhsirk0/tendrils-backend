@@ -85,10 +85,10 @@ export class FollowsService {
   }
 
   async getFollowers(plantname: string, name: string): Promise<StatusOk> {
-    let meFollowers = await this.followRepository.find({
-      where: { to: { plantname } },
-      relations: ['from'],
-      select: { id: false, from: { id: true, name: true, plantname: true } },
+    let meFollowing = await this.followRepository.find({
+      where: { from: { plantname } },
+      relations: ['to'],
+      select: { id: false, to: { id: true, name: true, plantname: true } },
     });
     let followers = await this.followRepository.find({
       where: { to: { plantname: name } },
@@ -104,7 +104,7 @@ export class FollowsService {
         followers: followers.map((f) => ({
           ...pick(f.from, 'id', 'name', 'plantname'),
           createdAt: f.createdAt,
-          isFollowed: meFollowers.some((pf) => pf.from.id === f.from.id),
+          isFollowed: meFollowing.some((pf) => pf.to.id === f.to.id),
           isMe: f.from.plantname === plantname,
         })),
       },
