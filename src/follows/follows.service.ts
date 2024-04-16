@@ -95,6 +95,7 @@ export class FollowsService {
       relations: ['from'],
       select: { id: false, from: { id: true, name: true, plantname: true } },
     });
+    console.log(meFollowing, followers);
 
     return {
       status: 201,
@@ -104,7 +105,7 @@ export class FollowsService {
         followers: followers.map((f) => ({
           ...pick(f.from, 'id', 'name', 'plantname'),
           createdAt: f.createdAt,
-          isFollowed: meFollowing.some((pf) => pf.to.id === f.to.id),
+          isFollowed: meFollowing.some((pf) => pf.to.id === f.from.id),
           isMe: f.from.plantname === plantname,
         })),
       },
