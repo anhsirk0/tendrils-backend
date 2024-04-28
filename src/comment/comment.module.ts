@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Tendril, Comment } from 'src/entities';
+import { Tendril, Comment, Plant } from 'src/entities';
 import { CommentService } from './comment.service';
 import { CommentController } from './comment.controller';
 
@@ -8,6 +8,7 @@ import { CommentController } from './comment.controller';
   imports: [
     TypeOrmModule.forFeature([Comment]),
     TypeOrmModule.forFeature([Tendril]),
+    TypeOrmModule.forFeature([Plant]),
   ],
   controllers: [CommentController],
   providers: [CommentService],

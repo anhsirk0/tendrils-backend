@@ -1,9 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Comment, Tendril } from 'src/entities';
+import { Comment, Plant, Tendril } from 'src/entities';
 import { StatusOk } from 'src/types';
 import { AddCommentDto } from './dto';
+import { pick } from 'src/helpers';
 
 @Injectable()
 export class CommentService {
@@ -12,9 +13,14 @@ export class CommentService {
     private commentsRepository: Repository<Comment>,
     @InjectRepository(Tendril)
     private tendrilRepository: Repository<Tendril>,
+    @InjectRepository(Plant)
+    private plantRepository: Repository<Plant>,
   ) {}
 
   async addComment(dto: AddCommentDto, plantname: string): Promise<StatusOk> {
+    let plant = await this.plantRepository.findOne({ where: { plantname } });
+    if (!plant) throw new BadRequestException('Plant does not exists');
+
     let tendril = await this.tendrilRepository.findOne({
       where: { uuid: dto.uuid },
     });
@@ -22,7 +28,7 @@ export class CommentService {
 
     let comment = this.commentsRepository.create({
       tendril,
-      plantname,
+      plant,
       content: dto.content,
     });
     comment = await this.commentsRepository.save(comment);
@@ -35,18 +41,23 @@ export class CommentService {
   }
 
   async getCommentsByTendril(uuid: string) {
-    let tendril = await this.tendrilRepository.findOne({
-      where: { uuid },
-    });
+    let tendril = await this.tendrilRepository.findOne({ where: { uuid } });
     if (!tendril) throw new BadRequestException('Tendril does not exists');
+
     const comments = await this.commentsRepository.find({
       where: { tendril: { uuid } },
+      relations: { plant: true },
+      select: { plant: { plantname: true, name: true } },
+      order: { createdAt: 'DESC' },
     });
 
     return {
       status: 200,
       message: 'Retrieved tendril comments successfully',
-      data: comments,
+      data: comments.map((c) => ({
+        ...c,
+        plant: pick(c.plant, 'plantname', 'name'),
+      })),
     };
   }
 }

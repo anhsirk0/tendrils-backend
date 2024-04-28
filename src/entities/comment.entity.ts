@@ -1,13 +1,13 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Tendril } from './tendril.entity';
+import { Tendril, Plant } from 'src/entities';
 
 @Entity()
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 17 })
-  plantname: string;
+  @ManyToOne(() => Plant, (plant) => plant.comments)
+  plant: Plant;
 
   @Column()
   content: string;

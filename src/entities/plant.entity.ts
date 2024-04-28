@@ -38,7 +38,7 @@ export class Plant {
   @OneToMany(() => Curl, (curl) => curl.plantname, { cascade: true })
   curls: Array<Curl>;
 
-  @OneToMany(() => Comment, (comment) => comment.plantname, { cascade: true })
+  @OneToMany(() => Comment, (comment) => comment.plant, { cascade: true })
   comments: Array<Comment>;
 
   @OneToMany(() => Follow, (follow) => follow.from, { cascade: true })

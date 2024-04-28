@@ -4,7 +4,6 @@ import { StatusOk } from 'src/types';
 import { Plantname } from 'src/plants/plant.decorator';
 import { TendrilsService } from './tendrils.service';
 import { CreateTendrilDto } from './dto';
-import { Tendril } from 'src/entities';
 import { Pagination } from 'src/paginate';
 import { Some } from 'src/helpers';
 import { Independent } from 'src/auth/auth.guard';
@@ -43,6 +42,7 @@ export class TendrilsController {
   }
 
   @Get(':uuid')
+  @Independent()
   getTendrilByUuid(
     @Param('uuid') uuid: string,
   ): Promise<StatusOk<FeedTendril>> {

@@ -95,7 +95,6 @@ export class FollowsService {
       relations: ['from'],
       select: { id: false, from: { id: true, name: true, plantname: true } },
     });
-    console.log(meFollowing, followers);
 
     return {
       status: 201,
