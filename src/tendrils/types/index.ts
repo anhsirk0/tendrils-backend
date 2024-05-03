@@ -7,5 +7,5 @@ export interface FeedTendril
   > {
   commentsCount: number;
   curls: Array<Plant['plantname']>;
-  author: Pick<Plant, 'name' | 'plantname'>;
+  author: Pick<Plant, 'name' | 'plantname' | 'avatarUrl'>;
 }

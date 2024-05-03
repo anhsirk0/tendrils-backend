@@ -44,7 +44,7 @@ export class AuthService {
     return {
       status: 201,
       message: 'Login successful',
-      data: { ...pick(plant, 'id', 'name', 'plantname'), token },
+      data: { ...pick(plant, 'id', 'name', 'plantname', 'avatarUrl'), token },
     };
   }
 

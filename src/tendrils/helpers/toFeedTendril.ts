@@ -9,6 +9,7 @@ function toFeedTendril(tendril: Tendril): FeedTendril {
     author: {
       name: tendril.plant.name,
       plantname: tendril.plant.plantname,
+      avatarUrl: tendril.plant.avatarUrl,
     },
   };
   delete ft.comments;

@@ -13,6 +13,10 @@ export class UpdatePlantDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @ApiProperty()
+  @IsString()
+  avatarUrl: string;
 }
 
 export class DeletePlantDto {

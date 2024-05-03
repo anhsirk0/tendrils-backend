@@ -40,6 +40,7 @@ export class PlantsService {
       plantname: true,
       name: true,
       createdAt: true,
+      avatarUrl: true,
     };
     let plant = await this.plantsRepository.findOne({
       // relations: ['followers', 'following', 'tendrils'],

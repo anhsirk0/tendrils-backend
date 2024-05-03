@@ -66,7 +66,10 @@ export class FollowsService {
     let following = await this.followRepository.find({
       where: { from: { plantname: name } },
       relations: ['to'],
-      select: { id: false, to: { id: true, name: true, plantname: true } },
+      select: {
+        id: false,
+        to: { id: true, name: true, plantname: true, avatarUrl: true },
+      },
     });
 
     return {
@@ -75,7 +78,7 @@ export class FollowsService {
       data: {
         plantname,
         following: following.map((f) => ({
-          ...pick(f.to, 'id', 'name', 'plantname'),
+          ...pick(f.to, 'id', 'name', 'plantname', 'avatarUrl'),
           createdAt: f.createdAt,
           isFollowed: meFollowing.some((pf) => pf.to.id === f.to.id),
           isMe: f.to.plantname === plantname,
@@ -93,7 +96,10 @@ export class FollowsService {
     let followers = await this.followRepository.find({
       where: { to: { plantname: name } },
       relations: ['from'],
-      select: { id: false, from: { id: true, name: true, plantname: true } },
+      select: {
+        id: false,
+        from: { id: true, name: true, plantname: true, avatarUrl: true },
+      },
     });
 
     return {
@@ -102,7 +108,7 @@ export class FollowsService {
       data: {
         plantname,
         followers: followers.map((f) => ({
-          ...pick(f.from, 'id', 'name', 'plantname'),
+          ...pick(f.from, 'id', 'name', 'plantname', 'avatarUrl'),
           createdAt: f.createdAt,
           isFollowed: meFollowing.some((pf) => pf.to.id === f.from.id),
           isMe: f.from.plantname === plantname,
