@@ -47,7 +47,7 @@ export class CommentService {
     const comments = await this.commentsRepository.find({
       where: { tendril: { uuid } },
       relations: { plant: true },
-      select: { plant: { plantname: true, name: true } },
+      select: { plant: { plantname: true, name: true, avatarUrl: true } },
       order: { createdAt: 'DESC' },
     });
 
@@ -56,7 +56,7 @@ export class CommentService {
       message: 'Retrieved tendril comments successfully',
       data: comments.map((c) => ({
         ...c,
-        plant: pick(c.plant, 'plantname', 'name'),
+        plant: pick(c.plant, 'plantname', 'name', 'avatarUrl'),
       })),
     };
   }
