@@ -47,6 +47,25 @@ export class TendrilsService {
     };
   }
 
+  async updateTendril(dto: CreateTendrilDto, uuid: string, plantname: string) {
+    let plant = await this.plantRepository.findOne({ where: { plantname } });
+    if (!plant) throw new BadRequestException('Plant does not exists');
+
+    let tendril = await this.tendrilRepository.findOne({ where: { uuid } });
+    if (!tendril) throw new BadRequestException('Tendril does not exists');
+
+    tendril = await this.tendrilRepository.save({
+      ...tendril,
+      title: dto.title,
+      content: dto.content,
+    });
+
+    return {
+      status: 201,
+      message: `Tendril '${dto.title}' updated successfully`,
+    };
+  }
+
   async getAllTendrils(plantname: string, options: PaginationOptions) {
     let plant = await this.plantRepository.findOne({ where: { plantname } });
     if (!plant) throw new BadRequestException('Plant does not exists');

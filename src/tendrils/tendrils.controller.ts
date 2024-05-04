@@ -18,6 +18,15 @@ export class TendrilsController {
     return this.tendrilsService.createTendril(dto, name);
   }
 
+  @Post('update/:uuid')
+  updateTendril(
+    @Body() dto: CreateTendrilDto,
+    @Param('uuid') uuid: string,
+    @Plantname() name: string,
+  ) {
+    return this.tendrilsService.updateTendril(dto, uuid, name);
+  }
+
   @Get('all/:plantname')
   @Independent()
   getAllTendrils(
