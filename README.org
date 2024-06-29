@@ -1,0 +1,28 @@
+* Tendrils
+#+ATTR_HTML: :width 200px :center t
+[[/logo.png]]
+** About
+Backend for a very simple text only social media + blog WebApp
+** Installation
+*** Requirements
+|------------+---------|
+| Technology | Version |
+|------------+---------|
+| Node       | LTS     |
+| pnpm       | *       |
+|------------+---------|
+*** Setup
+#+BEGIN_SRC shell
+git clone https://github.com/anhsirk0/tendrils-backend.git --depth=0
+cd tendrils-backend
+pnpm install
+pnpm run start
+#+END_SRC
+
+A =JWT_SECRET= key is also required in =.env= file
+#+BEGIN_SRC text
+JWT_SECRET=SOME_JWT_TOKEN_STRING
+#+END_SRC
+[[https://github.com/anhsirk0/tendrils-frontend][tendrils-frontend]] is the frontend for this
+** Tech Stack
+ - [[https://nestjs.com][Nestjs]]
