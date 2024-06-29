@@ -5,6 +5,8 @@ import { Comment, Plant, Tendril } from 'src/entities';
 import { StatusOk } from 'src/types';
 import { AddCommentDto } from './dto';
 import { pick } from 'src/helpers';
+import { Pagination, PaginationOptions } from 'src/paginate';
+import { CommentItem } from './types';
 
 @Injectable()
 export class CommentService {
@@ -40,24 +42,27 @@ export class CommentService {
     };
   }
 
-  async getCommentsByTendril(uuid: string) {
+  async getCommentsByTendril(uuid: string, options: PaginationOptions) {
     let tendril = await this.tendrilRepository.findOne({ where: { uuid } });
     if (!tendril) throw new BadRequestException('Tendril does not exists');
 
-    const comments = await this.commentsRepository.find({
+    const [result, total] = await this.commentsRepository.findAndCount({
+      ...options,
       where: { tendril: { uuid } },
       relations: { plant: true },
       select: { plant: { plantname: true, name: true, avatarUrl: true } },
       order: { createdAt: 'DESC' },
     });
 
+    const data = result.map<CommentItem>((comment) => ({
+      ...comment,
+      plant: pick(comment.plant, 'plantname', 'name', 'avatarUrl'),
+    }));
+
     return {
       status: 200,
       message: 'Retrieved tendril comments successfully',
-      data: comments.map((c) => ({
-        ...c,
-        plant: pick(c.plant, 'plantname', 'name', 'avatarUrl'),
-      })),
+      data: new Pagination<CommentItem>({ data, total }),
     };
   }
 }
