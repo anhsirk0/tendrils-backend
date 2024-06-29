@@ -4,8 +4,7 @@ import { StatusOk } from 'src/types';
 import { Plantname } from 'src/plants/plant.decorator';
 import { TendrilsService } from './tendrils.service';
 import { CreateTendrilDto } from './dto';
-import { Pagination } from 'src/paginate';
-import { Some } from 'src/helpers';
+import { Pagination, getPaginateOptions } from 'src/paginate';
 import { Independent } from 'src/auth/auth.guard';
 import { FeedTendril } from './types';
 
@@ -33,10 +32,10 @@ export class TendrilsController {
     @Param('plantname') plantname: string,
     @Req() request: Request,
   ) {
-    return this.tendrilsService.getAllTendrils(plantname, {
-      take: Some.Number(request.query?.take, 10),
-      skip: Some.Number(request.query?.skip),
-    });
+    return this.tendrilsService.getAllTendrils(
+      plantname,
+      getPaginateOptions(request.query),
+    );
   }
 
   @Get('feed')
@@ -44,10 +43,10 @@ export class TendrilsController {
     @Plantname() name: string,
     @Req() request: Request,
   ): Promise<StatusOk<Pagination<FeedTendril>>> {
-    return this.tendrilsService.getFeed(name, {
-      take: Some.Number(request.query?.take, 10),
-      skip: Some.Number(request.query?.skip),
-    });
+    return this.tendrilsService.getFeed(
+      name,
+      getPaginateOptions(request.query),
+    );
   }
 
   @Get(':uuid')

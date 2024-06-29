@@ -1,7 +1,11 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { FollowsService } from './follows.service';
+import { StatusOk } from 'src/types';
 import { Plantname } from 'src/plants/plant.decorator';
 import { PlantnameDto } from 'src/plants/dto';
+import { Pagination, getPaginateOptions } from 'src/paginate';
+import { FollowItem } from './types';
 
 @Controller('follows')
 export class FollowsController {
@@ -16,15 +20,25 @@ export class FollowsController {
   getFollowing(
     @Plantname() plantname: string,
     @Param('plantname') name: string,
-  ) {
-    return this.followsService.getFollowing(plantname, name);
+    @Req() request: Request,
+  ): Promise<StatusOk<Pagination<FollowItem>>> {
+    return this.followsService.getFollowing(
+      plantname,
+      name,
+      getPaginateOptions(request.query),
+    );
   }
 
   @Get('followers/:plantname')
   getFollowers(
     @Plantname() plantname: string,
     @Param('plantname') name: string,
-  ) {
-    return this.followsService.getFollowers(plantname, name);
+    @Req() request: Request,
+  ): Promise<StatusOk<Pagination<FollowItem>>> {
+    return this.followsService.getFollowers(
+      plantname,
+      name,
+      getPaginateOptions(request.query),
+    );
   }
 }

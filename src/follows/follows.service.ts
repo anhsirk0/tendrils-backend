@@ -5,6 +5,9 @@ import { Plant, Follow } from 'src/entities';
 import { StatusOk } from 'src/types';
 import { PlantnameDto } from 'src/plants/dto';
 import { pick } from 'src/helpers';
+import { Pagination, PaginationOptions } from 'src/paginate';
+import { FollowItem } from './types';
+import { toFollowItem } from './helpers';
 
 @Injectable()
 export class FollowsService {
@@ -56,14 +59,19 @@ export class FollowsService {
     };
   }
 
-  async getFollowing(plantname: string, name: string): Promise<StatusOk> {
+  async getFollowing(
+    plantname: string,
+    name: string,
+    options: PaginationOptions,
+  ): Promise<StatusOk<Pagination<FollowItem>>> {
     let meFollowing = await this.followRepository.find({
       where: { from: { plantname } },
       relations: ['to'],
       select: { id: false, to: { id: true, name: true, plantname: true } },
     });
 
-    let following = await this.followRepository.find({
+    const [result, total] = await this.followRepository.findAndCount({
+      ...options,
       where: { from: { plantname: name } },
       relations: ['to'],
       select: {
@@ -72,28 +80,29 @@ export class FollowsService {
       },
     });
 
+    const data = result.map((follow) =>
+      toFollowItem({ follow, plantname, meFollowing, key: 'to' }),
+    );
+
     return {
       status: 201,
       message: 'Fetched following successfully',
-      data: {
-        plantname,
-        following: following.map((f) => ({
-          ...pick(f.to, 'id', 'name', 'plantname', 'avatarUrl'),
-          createdAt: f.createdAt,
-          isFollowed: meFollowing.some((pf) => pf.to.id === f.to.id),
-          isMe: f.to.plantname === plantname,
-        })),
-      },
+      data: new Pagination<FollowItem>({ data, total }),
     };
   }
 
-  async getFollowers(plantname: string, name: string): Promise<StatusOk> {
+  async getFollowers(
+    plantname: string,
+    name: string,
+    options: PaginationOptions,
+  ): Promise<StatusOk<Pagination<FollowItem>>> {
     let meFollowing = await this.followRepository.find({
       where: { from: { plantname } },
       relations: ['to'],
       select: { id: false, to: { id: true, name: true, plantname: true } },
     });
-    let followers = await this.followRepository.find({
+    const [result, total] = await this.followRepository.findAndCount({
+      ...options,
       where: { to: { plantname: name } },
       relations: ['from'],
       select: {
@@ -102,18 +111,14 @@ export class FollowsService {
       },
     });
 
+    const data = result.map((follow) =>
+      toFollowItem({ follow, plantname, meFollowing, key: 'from' }),
+    );
+
     return {
       status: 201,
       message: 'Fetched followers successfully',
-      data: {
-        plantname,
-        followers: followers.map((f) => ({
-          ...pick(f.from, 'id', 'name', 'plantname', 'avatarUrl'),
-          createdAt: f.createdAt,
-          isFollowed: meFollowing.some((pf) => pf.to.id === f.from.id),
-          isMe: f.from.plantname === plantname,
-        })),
-      },
+      data: new Pagination<FollowItem>({ data, total }),
     };
   }
 }
