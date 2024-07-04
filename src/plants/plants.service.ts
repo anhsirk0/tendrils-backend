@@ -124,4 +124,20 @@ export class PlantsService {
       message: `Password for '${name}' updated successfully`,
     };
   }
+
+  async getPopular(): Promise<StatusOk<Array<Plant>>> {
+    let plants = await this.plantsRepository
+      .createQueryBuilder('plant')
+      .leftJoinAndSelect('plant.followers', 'follower')
+      .groupBy('plant.id')
+      .orderBy('COUNT(follower.id)', 'DESC')
+      .limit(20)
+      .getMany();
+
+    return {
+      status: 200,
+      message: 'Fetched popular plants successfully',
+      data: plants,
+    };
+  }
 }

@@ -42,7 +42,10 @@ export class CommentService {
     };
   }
 
-  async getCommentsByTendril(uuid: string, options: PaginationOptions) {
+  async getCommentsByTendril(
+    uuid: string,
+    options: PaginationOptions,
+  ): Promise<StatusOk<Pagination<CommentItem>>> {
     let tendril = await this.tendrilRepository.findOne({ where: { uuid } });
     if (!tendril) throw new BadRequestException('Tendril does not exists');
 
@@ -61,7 +64,7 @@ export class CommentService {
 
     return {
       status: 200,
-      message: 'Retrieved tendril comments successfully',
+      message: 'Fetched tendril comments successfully',
       data: new Pagination<CommentItem>({ data, total }),
     };
   }

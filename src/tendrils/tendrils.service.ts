@@ -93,7 +93,10 @@ export class TendrilsService {
     };
   }
 
-  async getFeed(plantname: string, options: PaginationOptions) {
+  async getFeed(
+    plantname: string,
+    options: PaginationOptions,
+  ): Promise<StatusOk<Pagination<FeedTendril>>> {
     let following = await this.followRepository.find({
       where: { from: { plantname } },
       relations: { to: true },

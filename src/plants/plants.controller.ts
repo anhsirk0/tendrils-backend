@@ -28,4 +28,10 @@ export class PlantsController {
   delete(@Body() dto: DeletePlantDto, @Plantname() name: string) {
     return this.plantsService.deletePlant(dto, name);
   }
+
+  @Independent()
+  @Get('popular')
+  getPopular() {
+    return this.plantsService.getPopular();
+  }
 }

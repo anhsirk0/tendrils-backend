@@ -1,5 +1,5 @@
 export interface StatusOk<T = any> {
-  status: number;
+  status: 200 | 201 | 202 | 203; // etc etc
   message: string;
   data?: T;
 }
