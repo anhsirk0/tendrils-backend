@@ -156,4 +156,25 @@ export class TendrilsService {
       data: { plantname, uuid, isCurled: !curl },
     };
   }
+
+  async getPopular(): Promise<StatusOk<Array<FeedTendril>>> {
+    // TODO: Fix later
+    let tendrils = await this.tendrilRepository
+      .createQueryBuilder('tendril')
+      .leftJoinAndSelect('tendril.comments', 'comment')
+      .leftJoinAndSelect('tendril.plant', 'plant')
+      .leftJoinAndSelect('tendril.curls', 'curl')
+      .groupBy('curl.id')
+      .orderBy('COUNT(curl.id)', 'DESC')
+      .limit(20)
+      .getMany();
+
+    // console.log(tendrils.map((t) => t.curls.length));
+
+    return {
+      status: 200,
+      message: 'Fetched popular tendrils successfully',
+      data: tendrils.map(toFeedTendril),
+    };
+  }
 }

@@ -26,8 +26,8 @@ export class TendrilsController {
     return this.tendrilsService.updateTendril(dto, uuid, name);
   }
 
-  @Get('all/:plantname')
   @Independent()
+  @Get('all/:plantname')
   getAllTendrils(
     @Param('plantname') plantname: string,
     @Req() request: Request,
@@ -49,8 +49,8 @@ export class TendrilsController {
     );
   }
 
-  @Get(':uuid')
   @Independent()
+  @Get('tendril/:uuid')
   getTendrilByUuid(
     @Param('uuid') uuid: string,
   ): Promise<StatusOk<FeedTendril>> {
@@ -60,5 +60,11 @@ export class TendrilsController {
   @Post('toggle-curl/:uuid')
   toggleCurl(@Plantname() plantname: string, @Param('uuid') uuid: string) {
     return this.tendrilsService.toggleCurl(plantname, uuid);
+  }
+
+  @Independent()
+  @Get('popular')
+  getPopular() {
+    return this.tendrilsService.getPopular();
   }
 }
