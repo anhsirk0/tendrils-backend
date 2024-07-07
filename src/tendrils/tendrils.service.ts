@@ -158,14 +158,16 @@ export class TendrilsService {
   }
 
   async getPopular(): Promise<StatusOk<Array<FeedTendril>>> {
-    // TODO: Fix later
+    // TODO: Fix later, sort by curl count
     let tendrils = await this.tendrilRepository
       .createQueryBuilder('tendril')
-      .leftJoinAndSelect('tendril.comments', 'comment')
       .leftJoinAndSelect('tendril.plant', 'plant')
+      .leftJoinAndSelect('tendril.comments', 'comment')
       .leftJoinAndSelect('tendril.curls', 'curl')
       .groupBy('curl.id')
-      .orderBy('COUNT(curl.id)', 'DESC')
+      .addGroupBy('comment.id')
+      .addGroupBy('tendril.id')
+      .orderBy('COUNT(comment.id)', 'DESC')
       .limit(20)
       .getMany();
 
